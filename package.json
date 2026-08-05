@@ -1,0 +1,27 @@
+{
+  "name": "ham-claw-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "test:public-surface": "node --test scripts/public-surface.test.mjs",
+    "test:release-contract": "node --test scripts/release-contract.test.mjs",
+    "test:release-publisher": "pwsh -NoProfile -File scripts/Test-ReleasePublisher.ps1",
+    "test:site-contract": "node --test scripts/site-contract.test.mjs",
+    "build": "npm run test:public-surface && npm run test:release-contract && npm run test:site-contract && astro check && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.1.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

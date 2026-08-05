@@ -1,0 +1,43 @@
+# dependencies
+node_modules/
+
+# Astro / build output
+.astro/
+dist/
+
+# local environment
+.env
+.env.*
+!.env.example
+
+# editor / OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# logs and local QA artifacts
+*.log
+npm-debug.log*
+coverage/
+playwright-report/
+test-results/
+tmp/
+
+# release binaries and signing material must never enter Git
+release-input/
+release-output/
+private-backups/
+*.bundle
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.app
+*.pfx
+*.p12
+*.pem
+*.key
+*.minisig

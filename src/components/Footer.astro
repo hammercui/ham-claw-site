@@ -1,0 +1,25 @@
+---
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import { site } from "../data/site";
+import { withBase } from "../lib/paths";
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner shell">
+    <Logo compact />
+    <nav aria-label="页脚导航">
+      <a href={withBase("/guide/")}>安装指南</a>
+      <a href={withBase("/changelog/")}>更新日志</a>
+      <a href={withBase("/privacy/")}>隐私</a>
+      <a href={withBase("/security/")}>安全</a>
+      {site.githubUrl && (
+        <a href={site.githubUrl} rel="noreferrer">
+          GitHub
+          <Icon name="external" size={15} />
+        </a>
+      )}
+    </nav>
+    <p>© {new Date().getFullYear()} 龙虾卫士</p>
+  </div>
+</footer>

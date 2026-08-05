@@ -1,0 +1,14 @@
+---
+import { withBase } from "../lib/paths";
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<a class:list={["brand", { "brand--compact": compact }]} href={withBase("/")} aria-label="龙虾卫士首页">
+  <img src={withBase("/assets/brand-mark.png")} width="256" height="256" alt="" />
+  <span>龙虾卫士</span>
+</a>

@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/paths";
+---
+
+<BaseLayout title="安装指南" description="龙虾卫士 Windows 版下载、首次启动、SmartScreen 与故障诊断指南。">
+  <header class="page-hero">
+    <div class="shell page-hero__inner">
+      <h1>安装指南</h1>
+      <p>从可信下载、首次启动到 OpenClaw 运行确认，按普通 Windows 用户能理解的顺序完成。</p>
+    </div>
+  </header>
+  <section class="prose-section">
+    <article class="shell prose">
+      <div class="notice">首个公开版本仍在通过发布门禁。当前官网不会提供未经验证的临时安装包。</div>
+
+      <h2>系统要求</h2>
+      <ul>
+        <li>Windows 11 x64。</li>
+        <li>Windows 10 SAC 1709+ x64。</li>
+        <li>Windows 10 Enterprise 2016 LTSC/LTSB 1607 x64；其他 Windows 10 1607 SKU 不在 WebView2 支持范围内。</li>
+        <li>能够访问所选模型供应商与 OpenClaw 所需网络。</li>
+      </ul>
+
+      <h2>下载与校验</h2>
+      <ol>
+        <li>只从本官网指向的 GitHub Release 下载 <code>OpenClawConsole.exe</code>。</li>
+        <li>在下载页核对版本、发布日期与 SHA-256。</li>
+        <li>需要更强验证时，下载同版本的 minisign 文件并按<a href={withBase("/security/")}>安全说明</a>校验。</li>
+      </ol>
+
+      <h2>首次启动</h2>
+      <ol>
+        <li>把 <code>OpenClawConsole.exe</code> 放到稳定目录，不要长期从浏览器临时下载目录运行。</li>
+        <li>双击启动。龙虾卫士是每用户应用，正常使用不要求管理员权限。</li>
+        <li>若系统缺少 WebView2，应用会使用内嵌的微软 Bootstrapper 引导安装。</li>
+        <li>进入“安装与升级”，按环境体检结果安装或接入 OpenClaw。</li>
+        <li>回到控制台，确认 Gateway 状态、Node 版本、默认模型和 18789 端口。</li>
+      </ol>
+
+      <h2>Windows SmartScreen</h2>
+      <p>公开预览版若尚未取得 Authenticode，Windows 可能显示“Windows 已保护你的电脑”。下载前先确认域名、文件名和 SHA-256。企业策略可能禁止运行未签名应用；这种情况下不要绕过组织策略。</p>
+
+      <h2 id="diagnosis">出现问题时</h2>
+      <p>优先打开“稳定中心”，不要盲目删除配置或结束未知进程。稳定中心会集中判断网关未运行、端口冲突、模型不可用、聊天无回复和配置无效，并给出安全动作。</p>
+      <ul>
+        <li>端口 owner 不明确时，只重新检查，不自动结束未知进程。</li>
+        <li>模型探针可能消耗少量 Token，执行前会明确确认。</li>
+        <li>聊天回复必须经过真实消息诊断或用户确认，连接状态不等于已经回复。</li>
+        <li>配置恢复只使用可信备份，写后重新验证，失败时条件回滚。</li>
+      </ul>
+
+      <h2>卸载</h2>
+      <p>先在应用内停止并确认 OpenClaw Gateway，再通过“安装与升级”中的卸载入口处理受管理组件。直接删除 exe 不会替你删除 OpenClaw 配置、会话或供应商凭证。</p>
+    </article>
+  </section>
+</BaseLayout>

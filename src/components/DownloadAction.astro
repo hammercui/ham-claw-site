@@ -1,0 +1,38 @@
+---
+import Icon from "./Icon.astro";
+import { currentRelease, formatBytes } from "../data/release";
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<div class:list={["release-action", { "release-action--compact": compact }]} data-release-status={currentRelease.status}>
+  {currentRelease.status === "available" ? (
+    <>
+      <a class="button button--primary" href={currentRelease.downloadUrl} download>
+        <Icon name="download" size={20} />
+        下载 Windows 版
+      </a>
+      <p class="release-action__meta">
+        v{currentRelease.version} · {formatBytes(currentRelease.bytes)} · Windows x64
+      </p>
+    </>
+  ) : currentRelease.status === "suspended" ? (
+    <>
+      <button class="button button--unavailable" type="button" disabled>
+        当前版本暂停下载
+      </button>
+      <p class="release-action__meta release-action__meta--warning">{currentRelease.reason}</p>
+    </>
+  ) : (
+    <>
+      <button class="button button--unavailable" type="button" disabled>
+        {currentRelease.message}
+      </button>
+      {!compact && <p class="release-action__meta">通过发布门禁后开放，不提供未经验证的安装包。</p>}
+    </>
+  )}
+</div>

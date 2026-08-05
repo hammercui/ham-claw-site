@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { currentRelease } from "../data/release";
+---
+
+<BaseLayout title="更新日志" description="龙虾卫士公开版本与面向用户的更新说明。">
+  <header class="page-hero">
+    <div class="shell page-hero__inner">
+      <h1>更新日志</h1>
+      <p>这里只记录已经公开、可下载并通过发布门禁的版本。</p>
+    </div>
+  </header>
+  <section class="prose-section">
+    <article class="shell prose">
+      {currentRelease.status === "available" ? (
+        <>
+          <h2>v{currentRelease.version}</h2>
+          <p>{currentRelease.notes}</p>
+          <p>发布时间：<time datetime={currentRelease.publishedAt}>{currentRelease.publishedAt}</time></p>
+        </>
+      ) : currentRelease.status === "suspended" ? (
+        <div class="notice">当前公开版本已暂停分发：{currentRelease.reason}</div>
+      ) : (
+        <div class="notice">首个 Windows 公开版本准备中，目前还没有可公开的版本记录。</div>
+      )}
+    </article>
+  </section>
+</BaseLayout>
