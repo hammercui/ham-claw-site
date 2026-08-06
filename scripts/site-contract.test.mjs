@@ -32,6 +32,17 @@ test("homepage contains exactly the five approved diagnosis rows", async () => {
   }
 });
 
+test("document page navigation only points to existing section ids", async () => {
+  for (const page of ["guide.astro", "security.astro", "privacy.astro"]) {
+    const source = await readFile(path.join(srcRoot, "pages", page), "utf8");
+    const targets = [...source.matchAll(/href:\s*"#([^"]+)"/g)].map((match) => match[1]);
+    assert(targets.length > 0, `${page} 缺少本页导航`);
+    for (const target of targets) {
+      assert.match(source, new RegExp(`<h2\\s+id="${target}"`), `${page} 的 #${target} 没有对应章节`);
+    }
+  }
+});
+
 test("source contains no fake owner, placeholder contact, remote font, or tracking script", async () => {
   const files = await filesUnder(srcRoot);
   const source = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
@@ -68,6 +79,20 @@ test("GitHub project Pages base path is configurable and applied to public links
   assert.match(workflow, /BASE_PATH:\s*\$\{\{ vars\.BASE_PATH \}\}/);
   assert.match(pathHelper, /import\.meta\.env\.BASE_URL/);
   assert(!/(?:href|src)="\/(?!\/)/.test(astroSource), "Astro 模板含绕过 BASE_PATH 的根路径链接");
+});
+
+test("controlled preview entry is HTTPS-only and remains fail-closed when absent", async () => {
+  const siteData = await readFile(path.join(srcRoot, "data", "site.ts"), "utf8");
+  const homepage = await readFile(path.join(srcRoot, "pages", "index.astro"), "utf8");
+  const guide = await readFile(path.join(srcRoot, "pages", "guide.astro"), "utf8");
+  const workflow = await readFile(path.join(root, ".github", "workflows", "pages.yml"), "utf8");
+
+  assert.match(siteData, /url\.protocol === "https:"/);
+  assert.match(siteData, /PUBLIC_PREVIEW_APPLY_URL/);
+  assert.match(workflow, /PUBLIC_PREVIEW_APPLY_URL:\s*\$\{\{ vars\.PUBLIC_PREVIEW_APPLY_URL \}\}/);
+  assert.match(homepage, /site\.previewApplyUrl \? "申请预览资格" : "了解预览资格"/);
+  assert.match(guide, /id="preview-access"/);
+  assert.match(guide, /入口准备完成前不会公开安装包/);
 });
 
 test("published updater public key matches the release intake validator", async () => {

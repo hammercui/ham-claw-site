@@ -1,6 +1,7 @@
 ---
 import Icon from "./Icon.astro";
 import Logo from "./Logo.astro";
+import { currentRelease } from "../data/release";
 import { navigation } from "../data/site";
 import { withBase } from "../lib/paths";
 ---
@@ -11,17 +12,28 @@ import { withBase } from "../lib/paths";
     <nav class="desktop-nav" aria-label="主要导航">
       {navigation.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
-    <a class="button button--primary header-download" href={withBase("/#download")}>
-      <Icon name="download" size={18} />
-      下载 Windows 版
-    </a>
+    {currentRelease.status === "available" ? (
+      <a class="button button--primary header-download" href={withBase("/#download")}>
+        <Icon name="download" size={18} />
+        下载 Windows 版
+      </a>
+    ) : (
+      <button class="button header-download header-download--unavailable" type="button" disabled>
+        <Icon name="windows" size={17} />
+        {currentRelease.status === "preparing" ? currentRelease.message : "当前版本暂停下载"}
+      </button>
+    )}
     <details class="mobile-nav">
       <summary aria-label="打开导航菜单">
         <Icon name="menu" size={24} />
       </summary>
       <nav aria-label="移动端导航">
         {navigation.map((item) => <a href={item.href}>{item.label}</a>)}
-        <a class="mobile-nav__download" href={withBase("/#download")}>下载 Windows 版</a>
+        {currentRelease.status === "available" ? (
+          <a class="mobile-nav__download" href={withBase("/#download")}>下载 Windows 版</a>
+        ) : (
+          <span class="mobile-nav__download mobile-nav__download--unavailable">首个 Windows 公开版本准备中</span>
+        )}
       </nav>
     </details>
   </div>

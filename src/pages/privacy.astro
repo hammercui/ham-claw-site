@@ -1,34 +1,43 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import DocumentLayout from "../components/DocumentLayout.astro";
+import PageHero from "../components/PageHero.astro";
+
+const navigation = [
+  { href: "#collection", label: "官网收集什么" },
+  { href: "#not-collected", label: "官网不会接收什么" },
+  { href: "#infrastructure", label: "第三方基础设施" },
+  { href: "#desktop-app", label: "桌面应用" },
+  { href: "#changes", label: "变更" }
+] as const;
 ---
 
 <BaseLayout title="隐私说明" description="龙虾卫士官网与桌面应用的隐私边界。">
-  <header class="page-hero">
-    <div class="shell page-hero__inner">
-      <h1>隐私说明</h1>
-      <p>官网保持简单：不要求账号，不接收模型密钥，也不把应用中的消息和配置上传到本站。</p>
-    </div>
-  </header>
+  <PageHero
+    eyebrow="PRIVACY BOUNDARY"
+    title="隐私说明"
+    description="官网保持简单：不要求账号，不接收模型密钥，也不把应用中的消息和配置上传到本站。"
+  />
   <section class="prose-section">
-    <article class="shell prose">
-      <h2>官网收集什么</h2>
+    <DocumentLayout items={navigation}>
+      <h2 id="collection">官网收集什么</h2>
       <p>当前静态官网不提供注册、登录、支付、评论或上传功能，也不主动接入 Cookie 型行为分析和广告追踪。</p>
 
-      <h2>官网不会接收什么</h2>
+      <h2 id="not-collected">官网不会接收什么</h2>
       <ul>
         <li>模型供应商 API Key、OAuth Token 或聊天软件凭证。</li>
         <li>OpenClaw 配置正文、消息、会话、日志和诊断原始数据。</li>
         <li>许可证私钥、更新签名私钥或支付信息。</li>
       </ul>
 
-      <h2>第三方基础设施</h2>
+      <h2 id="infrastructure">第三方基础设施</h2>
       <p>官网由 GitHub Pages 托管，应用包由 GitHub Releases 分发。访问和下载时，GitHub 可能按其自身政策处理必要的网络与安全日志。</p>
 
-      <h2>桌面应用</h2>
+      <h2 id="desktop-app">桌面应用</h2>
       <p>龙虾卫士在本机管理 OpenClaw。供应商密钥只在需要时局部读取，不进入官网、应用日志或公开发布元数据。诊断导出只允许固定白名单与脱敏字段。</p>
 
-      <h2>变更</h2>
+      <h2 id="changes">变更</h2>
       <p>如果未来加入购买、账号、错误上报或访问分析，本页必须在功能启用前说明数据类型、目的、保留时间和退出方式。</p>
-    </article>
+    </DocumentLayout>
   </section>
 </BaseLayout>

@@ -25,6 +25,7 @@ coverage/
 playwright-report/
 test-results/
 tmp/
+design-qa.md
 
 # release binaries and signing material must never enter Git
 release-input/

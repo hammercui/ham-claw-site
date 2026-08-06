@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const root = path.resolve(import.meta.dirname, "..");
-const tracked = execFileSync("git", ["ls-files", "-z"], {
+const publicCandidates = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
   cwd: root,
   encoding: "utf8",
 }).split("\0").filter(Boolean);
@@ -33,12 +33,12 @@ const forbiddenText = [
   new RegExp(["AI", "协作"].join("\\s*"), "i"),
 ];
 
-test("tracked files stay inside the public repository boundary", async () => {
-  const badPaths = tracked.filter((file) => forbiddenPaths.some((rule) => rule.test(file)));
-  assert.deepEqual(badPaths, [], `forbidden tracked files:\n${badPaths.join("\n")}`);
+test("public candidate files stay inside the repository boundary", async () => {
+  const badPaths = publicCandidates.filter((file) => forbiddenPaths.some((rule) => rule.test(file)));
+  assert.deepEqual(badPaths, [], `forbidden public candidate files:\n${badPaths.join("\n")}`);
 
   const findings = [];
-  for (const file of tracked) {
+  for (const file of publicCandidates) {
     const bytes = await readFile(path.join(root, file));
     if (bytes.includes(0)) continue;
     const content = bytes.toString("utf8");

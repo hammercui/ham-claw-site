@@ -1,6 +1,6 @@
 # 龙虾卫士官网与发布入口
 
-本仓库仅承载龙虾卫士的公开官网、用户帮助和 GitHub Release 发布门禁。
+本仓库仅承载龙虾卫士的公开官网、用户帮助和 GitHub Release 发布校验。
 
 - 公开仓库：<https://github.com/hammercui/ham-claw-site>
 - GitHub Pages：<https://hammercui.github.io/ham-claw-site/>
@@ -18,7 +18,7 @@
 - 签名私钥、证书、API Key、令牌和未脱敏日志；
 - 非公开的研发管理资料；
 - 本机路径、非公开服务地址、内部仓库名称或提交标识；
-- 应用源码、构建输入和未经发布门禁确认的安装包。
+- 应用源码、构建输入和未经完整性校验的安装包。
 
 ## 本地运行
 
@@ -46,5 +46,6 @@ npm run build
 - `BASE_PATH`：项目 Pages 路径，当前为 `/ham-claw-site`。
 - `PUBLIC_GITHUB_URL`：公开仓库地址；未配置时不显示 GitHub 入口。
 - `PUBLIC_SUPPORT_EMAIL`：公开支持邮箱；未配置时不显示邮箱。
+- `PUBLIC_PREVIEW_APPLY_URL`：受控预览申请入口，只接受 HTTPS；未配置时如实显示“入口准备中”。
 
 正式发布前，网站会保持“准备中”，Release 也只创建为 Draft。

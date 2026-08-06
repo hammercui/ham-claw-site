@@ -1,0 +1,29 @@
+---
+interface NavigationItem {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  items: readonly NavigationItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="shell document-layout">
+  <aside class="document-nav">
+    <p>本页内容</p>
+    <nav aria-label="本页内容">
+      {items.map((item, index) => (
+        <a href={item.href}>
+          <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </aside>
+  <article class="prose">
+    <slot />
+  </article>
+</div>

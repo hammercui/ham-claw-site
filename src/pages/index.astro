@@ -2,42 +2,79 @@
 import DownloadAction from "../components/DownloadAction.astro";
 import Icon from "../components/Icon.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { currentRelease, formatBytes } from "../data/release";
+import { site } from "../data/site";
 import { withBase } from "../lib/paths";
+import "../styles/home.css";
 
 const workflow = [
-  ["安装与运行", "检查环境、安装 OpenClaw，并稳定托管网关。"],
-  ["供应商与模型", "接入常用服务，清楚选择默认模型。"],
-  ["聊天软件", "配置 Telegram 等通道，并验证真实回复。"],
-  ["Skills 与定时任务", "搜索能力、管理依赖，安排自动任务。"]
+  ["安装与运行", "检查环境、安装 OpenClaw，并稳定托管网关。", "download"],
+  ["供应商与模型", "接入常用服务，清楚选择默认模型。", "plug"],
+  ["聊天软件", "配置 Telegram 等通道，并验证真实回复。", "message"],
+  ["Skills 与定时任务", "搜索能力、管理依赖，安排自动任务。", "calendar"]
 ] as const;
 
 const diagnoses = [
-  ["网关未运行", "聊天与 API 暂时不可用", "确认状态后启动服务"],
-  ["端口冲突", "网关无法绑定 18789", "确认占用程序后重新检查"],
-  ["模型不可用", "请求失败，无法生成回复", "切换模型或确认后最小探针"],
-  ["聊天无回复", "通道连接但闭环未确认", "进入 60 秒消息诊断"],
-  ["配置无效", "相关功能无法安全生效", "确认后恢复最近安全备份"]
+  ["网关未运行", "服务未启动或进程异常退出", "聊天与 API 暂时不可用", "进入稳定中心启动服务", "shield"],
+  ["端口冲突", "18789 端口被其他程序占用", "网关无法绑定端口", "更换端口或释放占用", "plug"],
+  ["模型不可用", "模型不存在或被供应商下线", "请求失败，无法生成回复", "切换可用模型", "alert"],
+  ["聊天无回复", "通道未连通或权限不足", "消息发送后无响应", "检查连接与权限", "messageWarning"],
+  ["配置无效", "Key、地址或设置格式错误", "相关功能无法生效", "校验配置并保存", "settings"]
 ] as const;
 
 const trust = [
   ["网关守护", "识别退出与端口冲突，按安全边界恢复。", "shield"],
-  ["配置保护", "写入前备份，写后验证，失败时条件回滚。", "terminal"],
+  ["配置保护", "写入前备份，写后验证，失败时条件回滚。", "fileCheck"],
   ["更新校验", "SHA-256 与 minisign 双重验证后才换新。", "check"],
-  ["隐私边界", "密钥不进入官网、日志或公开发布元数据。", "spark"]
+  ["隐私边界", "密钥不进入官网、日志或公开发布元数据。", "lock"]
 ] as const;
+
+const releaseStatus = currentRelease.status === "available"
+  ? "正式版本可下载"
+  : currentRelease.status === "suspended"
+    ? "当前版本暂停下载"
+    : currentRelease.message;
+
+const releaseFacts = currentRelease.status === "available"
+  ? [
+      ["当前版本", `v${currentRelease.version}`],
+      ["安装包大小", formatBytes(currentRelease.bytes)],
+      ["目标平台", "Windows 10/11 · x64"],
+      ["完整性校验", "SHA-256 · minisign"]
+    ]
+  : [
+      ["当前阶段", currentRelease.status === "suspended" ? "下载暂停" : "公开发布准备"],
+      ["目标平台", "Windows 10/11 · x64"],
+      ["交付形式", "OpenClawConsole.exe · 单文件"],
+      ["完整性校验", "SHA-256 · minisign"]
+    ];
 ---
 
 <BaseLayout>
-  <section class="hero shell">
+  <div class="home-page">
+  <section class="hero shell" aria-labelledby="hero-title">
     <div class="hero__copy">
-      <h1>让 OpenClaw<br />稳定运行，人人都能用</h1>
-      <p>安装、供应商、聊天软件、Skills、定时任务和故障恢复，一个桌面工具完成。</p>
+      <h1 id="hero-title"><span>让 OpenClaw</span><span>稳定运行，人人都能用</span></h1>
+      <p class="hero__summary">安装、供应商、聊天软件、Skills、定时任务和<br class="hero__desktop-break" />故障恢复，一个桌面工具完成。</p>
       <div class="hero__actions">
-        <DownloadAction compact />
-        <a class="button button--secondary" href={withBase("/guide/")}>查看安装指南</a>
+        {currentRelease.status === "available" ? (
+          <>
+            <DownloadAction compact />
+            <a class="button button--secondary" href={withBase("/guide/")}>查看安装指南</a>
+          </>
+        ) : (
+          <>
+            <a class="button button--primary" href={withBase("/guide/")}>查看安装指南</a>
+            <a class="button button--secondary" href={withBase("/changelog/")}>查看发布进度</a>
+          </>
+        )}
       </div>
-      <p class="platform-line">Windows 10/11 · x64 · 单文件运行</p>
+      <p class="hero__release-state">
+        <span aria-hidden="true"></span>
+        {releaseStatus} · Windows x64
+      </p>
     </div>
+
     <figure class="product-frame hero__product">
       <img
         src={withBase("/assets/product-console.png")}
@@ -46,87 +83,76 @@ const trust = [
         alt="龙虾卫士控制台，显示 OpenClaw 运行状态、环境信息、供应商和聊天软件连接"
         fetchpriority="high"
       />
-      <figcaption>真实桌面界面 · 控制台</figcaption>
+      <figcaption>
+        <strong>真实桌面界面</strong>
+        <span>运行状态、环境、供应商与聊天连接一屏可见</span>
+      </figcaption>
     </figure>
   </section>
 
-  <section class="section section--soft" id="capabilities">
+  <section class="section workflow-section" id="capabilities" aria-labelledby="workflow-title">
     <div class="shell">
       <div class="section-heading section-heading--wide">
-        <h2>把零散的命令行工作，收进一个桌面工作区</h2>
+        <h2 id="workflow-title">把零散的命令行工作，收进一个桌面工作区</h2>
         <p>围绕日常任务组织入口，不要求用户先理解 Node、JSON 或命令参数。</p>
       </div>
-      <div class="workflow-grid" id="workflow">
-        <ol class="workflow-list">
-          {workflow.map(([title, description], index) => (
-            <li class:list={{ "is-current": index === 0 }}>
-              <span class="workflow-list__number">{index + 1}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{description}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <div class="workflow-detail" aria-label="桌面工作流摘要">
-          <div class="workflow-detail__bar">
-            <span class="window-dot window-dot--red"></span>
-            <span class="window-dot window-dot--yellow"></span>
-            <span class="window-dot window-dot--green"></span>
-            <span>龙虾卫士 · 控制台</span>
-          </div>
-          <div class="workflow-detail__body">
-            <div class="workflow-detail__status">
-              <span class="status-light"></span>
-              <div><strong>OpenClaw 正在运行</strong><span>网关状态和关键环境集中可见</span></div>
-            </div>
-            <dl>
-              <div><dt>运行环境</dt><dd>版本、Node、默认模型、端口</dd></div>
-              <div><dt>常用入口</dt><dd>供应商、聊天软件、Skills、定时任务</dd></div>
-              <div><dt>维护工具</dt><dd>稳定中心、日志、安装与升级</dd></div>
-            </dl>
-          </div>
-        </div>
-      </div>
+
+      <ol class="workflow-rail" id="workflow">
+        {workflow.map(([title, description, icon], index) => (
+          <li class:list={{ "is-current": index === 0 }}>
+            <span class="workflow-rail__index" aria-hidden="true">{index + 1}</span>
+            <span class="workflow-rail__icon"><Icon name={icon} size={28} /></span>
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
-  <section class="section diagnosis-section">
-    <div class="shell diagnosis-grid">
-      <div class="section-heading diagnosis-copy">
-        <h2>出现问题时，知道原因，也知道下一步</h2>
-        <p>五类常见故障进入同一条诊断路径。证据不足时明确显示未知，不用猜。</p>
+  <section class="section diagnosis-section" aria-labelledby="diagnosis-title">
+    <div class="shell">
+      <div class="section-heading section-heading--wide diagnosis-heading">
+        <div>
+          <h2 id="diagnosis-title">出现问题时，知道原因，也知道下一步</h2>
+          <p>五类常见故障进入同一条诊断路径。证据不足时明确显示未知，不用猜。</p>
+        </div>
         <a class="text-link" href={withBase("/guide/#diagnosis")}>了解故障恢复流程 <Icon name="arrow" size={18} /></a>
       </div>
+
       <div class="diagnosis-table" role="table" aria-label="五类常见故障恢复路径">
         <div class="diagnosis-table__header" role="row">
           <span role="columnheader">问题现象</span>
+          <span role="columnheader">可能原因</span>
           <span role="columnheader">影响</span>
-          <span role="columnheader">下一步</span>
+          <span role="columnheader">下一步建议</span>
         </div>
-        {diagnoses.map(([problem, impact, action], index) => (
+        {diagnoses.map(([problem, cause, impact, action, icon], index) => (
           <div class="diagnosis-row" role="row">
             <span role="cell" class="diagnosis-row__problem">
-              <span class={`diagnosis-mark diagnosis-mark--${index + 1}`}></span>{problem}
+              <span class={`diagnosis-mark diagnosis-mark--${index + 1}`}><Icon name={icon} size={18} /></span>
+              {problem}
             </span>
+            <span role="cell" data-label="可能原因">{cause}</span>
             <span role="cell" data-label="影响">{impact}</span>
-            <span role="cell" data-label="下一步" class="diagnosis-row__action">{action}</span>
+            <span role="cell" data-label="下一步建议" class="diagnosis-row__action">{action}<Icon name="arrow" size={17} /></span>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section section--soft" id="trust">
-    <div class="shell trust-grid">
-      <div class="section-heading trust-copy">
-        <h2>稳定，不靠碰运气</h2>
+  <section class="section trust-section" id="trust" aria-labelledby="trust-title">
+    <div class="shell">
+      <div class="section-heading section-heading--wide">
+        <h2 id="trust-title">稳定，不靠碰运气</h2>
         <p>OpenClaw 的每一次运行、配置和更新，都在可验证、可回滚、可追溯的边界内完成。</p>
       </div>
+
       <div class="trust-list">
         {trust.map(([title, description, icon]) => (
           <article>
-            <span class="trust-list__icon"><Icon name={icon} size={25} /></span>
+            <span class="trust-list__icon"><Icon name={icon} size={30} /></span>
             <h3>{title}</h3>
             <p>{description}</p>
           </article>
@@ -135,24 +161,63 @@ const trust = [
     </div>
   </section>
 
-  <section class="section download-section" id="download">
-    <div class="shell download-panel">
-      <div>
-        <h2>准备好以后，从这里开始</h2>
-        <p class="download-panel__status"><Icon name="calendar" size={21} />首个 Windows 公开版本准备中</p>
-        <p class="platform-line">Windows 10/11 · x64 · 单文件运行</p>
+  <section class="section release-section" id="download" aria-labelledby="download-title">
+    <div class="shell release-layout">
+      <div class="release-copy">
+        <p class="section-kicker">PUBLIC RELEASE</p>
+        <h2 id="download-title">一个清楚、可验证的安装入口</h2>
+        <p>公开版本只从 GitHub Releases 分发。安装包、版本信息和校验方式在同一个位置公布。</p>
+        <div class="release-copy__action">
+          <DownloadAction />
+          {currentRelease.status !== "available" && (
+            <a
+              class="text-link"
+              href={site.previewApplyUrl ?? withBase("/guide/#preview-access")}
+              target={site.previewApplyUrl ? "_blank" : undefined}
+              rel={site.previewApplyUrl ? "noreferrer" : undefined}
+            >
+              {site.previewApplyUrl ? "申请预览资格" : "了解预览资格"} <Icon name="arrow" size={18} />
+            </a>
+          )}
+          <a class="text-link" href={withBase("/guide/")}>查看安装指南 <Icon name="arrow" size={18} /></a>
+        </div>
       </div>
-      <div class="download-panel__action">
-        <DownloadAction />
-        <a class="text-link" href={withBase("/guide/")}>查看安装指南 <Icon name="arrow" size={18} /></a>
+
+      <div class="release-ledger" aria-label="Windows 公开版本信息">
+        <div class="release-ledger__status">
+          <span class:list={["release-status-dot", `release-status-dot--${currentRelease.status}`]} aria-hidden="true"></span>
+          <div>
+            <span>Windows 公开版本</span>
+            <strong>{releaseStatus}</strong>
+          </div>
+        </div>
+        <dl>
+          {releaseFacts.map(([label, value]) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p>下载开放后，本区会同步显示真实版本、文件大小与发布状态。</p>
       </div>
     </div>
   </section>
 
-  <section class="section faq-section" id="faq">
-    <div class="shell faq-grid">
-      <h2>常见问题</h2>
+  <section class="section faq-section" id="faq" aria-labelledby="faq-title">
+    <div class="shell">
+      <h2 id="faq-title">常见问题</h2>
       <div class="faq-list">
+        <details>
+          <summary>怎样参加首轮公开预览？<Icon name="chevron" size={20} /></summary>
+          <p>
+            首轮预览采用邀请制，安装后需要激活码。{site.previewApplyUrl ? (
+              <a class="text-link" href={site.previewApplyUrl} target="_blank" rel="noreferrer">前往安全申请入口</a>
+            ) : (
+              <>申请入口仍在准备中；入口开放前，官网不会提供无法正常使用的安装包。</>
+            )}
+          </p>
+        </details>
         <details>
           <summary>龙虾卫士会替代 OpenClaw 吗？<Icon name="chevron" size={20} /></summary>
           <p>不会。龙虾卫士是 OpenClaw 的 Windows 桌面控制中心，复用其会话、模型、工具和记忆，不另造第二个 Agent 内核。</p>
@@ -168,4 +233,5 @@ const trust = [
       </div>
     </div>
   </section>
+  </div>
 </BaseLayout>

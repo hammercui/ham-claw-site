@@ -1,37 +1,45 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import DocumentLayout from "../components/DocumentLayout.astro";
+import PageHero from "../components/PageHero.astro";
+
+const navigation = [
+  { href: "#release-files", label: "官方发布文件" },
+  { href: "#sha256", label: "核对 SHA-256" },
+  { href: "#minisign", label: "验证 minisign" },
+  { href: "#exceptions", label: "遇到异常" }
+] as const;
 ---
 
 <BaseLayout title="安全与校验" description="验证龙虾卫士下载来源、SHA-256 与 minisign 签名。">
-  <header class="page-hero">
-    <div class="shell page-hero__inner">
-      <h1>安全与校验</h1>
-      <p>安装包只有在来源、哈希和签名都能对应同一公开版本时才可信。</p>
-    </div>
-  </header>
+  <PageHero
+    eyebrow="RELEASE SECURITY"
+    title="安全与校验"
+    description="安装包只有在来源、哈希和签名都能对应同一公开版本时才可信。"
+  />
   <section class="prose-section">
-    <article class="shell prose">
-      <h2>官方发布文件</h2>
+    <DocumentLayout items={navigation}>
+      <h2 id="release-files">官方发布文件</h2>
       <p>每个公开版本应包含固定的五项文件：</p>
       <span class="code-line">OpenClawConsole.exe · OpenClawConsole.exe.minisig · SHA256SUMS.txt · latest.json · release-provenance.json</span>
 
-      <h2>核对 SHA-256</h2>
+      <h2 id="sha256">核对 SHA-256</h2>
       <p>在 PowerShell 中运行：</p>
       <span class="code-line">Get-FileHash -Algorithm SHA256 .\OpenClawConsole.exe</span>
       <p>输出必须与同版本下载页和 <code>SHA256SUMS.txt</code> 完全一致。大小写可以不同，字符不能缺失。</p>
 
-      <h2>验证 minisign</h2>
+      <h2 id="minisign">验证 minisign</h2>
       <p>应用自身会使用内置生产公钥验证更新包。手工验证必须使用 Release 附带的 minisign 文件和以下同一把生产公钥：</p>
       <pre><code>RWSN701ZUoQPuvaL2UVa59eRzF7ULwkBVQ/fQMuBT8ILN/KxOC7gxngr</code></pre>
       <p>公钥可以公开；对应私钥永远不进入客户端、官网仓库或 GitHub Actions。</p>
 
-      <h2>遇到异常</h2>
+      <h2 id="exceptions">遇到异常</h2>
       <ul>
         <li>文件名不是 <code>OpenClawConsole.exe</code>：停止运行并重新确认来源。</li>
         <li>哈希不一致或签名失败：删除该文件，不要尝试绕过。</li>
         <li>Release 被标记暂停：等待更高版本热修复。</li>
         <li>发现疑似漏洞：公开仓库启用后通过 GitHub Security Advisory 私下报告，不在公开 Issue 粘贴密钥、日志或配置。</li>
       </ul>
-    </article>
+    </DocumentLayout>
   </section>
 </BaseLayout>

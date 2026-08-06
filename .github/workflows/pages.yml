@@ -29,6 +29,7 @@ jobs:
           BASE_PATH: ${{ vars.BASE_PATH }}
           PUBLIC_GITHUB_URL: ${{ vars.PUBLIC_GITHUB_URL }}
           PUBLIC_SUPPORT_EMAIL: ${{ vars.PUBLIC_SUPPORT_EMAIL }}
+          PUBLIC_PREVIEW_APPLY_URL: ${{ vars.PUBLIC_PREVIEW_APPLY_URL }}
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

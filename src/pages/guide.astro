@@ -1,20 +1,31 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import DocumentLayout from "../components/DocumentLayout.astro";
+import PageHero from "../components/PageHero.astro";
 import { withBase } from "../lib/paths";
+
+const navigation = [
+  { href: "#requirements", label: "系统要求" },
+  { href: "#preview-access", label: "预览资格" },
+  { href: "#download-and-verify", label: "下载与校验" },
+  { href: "#first-run", label: "首次启动" },
+  { href: "#smartscreen", label: "Windows SmartScreen" },
+  { href: "#diagnosis", label: "出现问题时" },
+  { href: "#uninstall", label: "卸载" }
+] as const;
 ---
 
 <BaseLayout title="安装指南" description="龙虾卫士 Windows 版下载、首次启动、SmartScreen 与故障诊断指南。">
-  <header class="page-hero">
-    <div class="shell page-hero__inner">
-      <h1>安装指南</h1>
-      <p>从可信下载、首次启动到 OpenClaw 运行确认，按普通 Windows 用户能理解的顺序完成。</p>
-    </div>
-  </header>
+  <PageHero
+    eyebrow="GETTING STARTED"
+    title="安装指南"
+    description="从可信下载、首次启动到 OpenClaw 运行确认，按普通 Windows 用户能理解的顺序完成。"
+  />
   <section class="prose-section">
-    <article class="shell prose">
-      <div class="notice">首个公开版本仍在通过发布门禁。当前官网不会提供未经验证的临时安装包。</div>
+    <DocumentLayout items={navigation}>
+      <div class="notice">首个公开版本仍在进行完整性与兼容性验证。当前官网不会提供未经验证的临时安装包。</div>
 
-      <h2>系统要求</h2>
+      <h2 id="requirements">系统要求</h2>
       <ul>
         <li>Windows 11 x64。</li>
         <li>Windows 10 SAC 1709+ x64。</li>
@@ -22,14 +33,17 @@ import { withBase } from "../lib/paths";
         <li>能够访问所选模型供应商与 OpenClaw 所需网络。</li>
       </ul>
 
-      <h2>下载与校验</h2>
+      <h2 id="preview-access">预览资格</h2>
+      <p>首轮公开预览采用邀请制，首次使用需要激活码。安全申请入口开放后会由官网统一指向；入口准备完成前不会公开安装包，避免出现下载安装后无法使用的情况。</p>
+
+      <h2 id="download-and-verify">下载与校验</h2>
       <ol>
         <li>只从本官网指向的 GitHub Release 下载 <code>OpenClawConsole.exe</code>。</li>
         <li>在下载页核对版本、发布日期与 SHA-256。</li>
         <li>需要更强验证时，下载同版本的 minisign 文件并按<a href={withBase("/security/")}>安全说明</a>校验。</li>
       </ol>
 
-      <h2>首次启动</h2>
+      <h2 id="first-run">首次启动</h2>
       <ol>
         <li>把 <code>OpenClawConsole.exe</code> 放到稳定目录，不要长期从浏览器临时下载目录运行。</li>
         <li>双击启动。龙虾卫士是每用户应用，正常使用不要求管理员权限。</li>
@@ -38,7 +52,7 @@ import { withBase } from "../lib/paths";
         <li>回到控制台，确认 Gateway 状态、Node 版本、默认模型和 18789 端口。</li>
       </ol>
 
-      <h2>Windows SmartScreen</h2>
+      <h2 id="smartscreen">Windows SmartScreen</h2>
       <p>公开预览版若尚未取得 Authenticode，Windows 可能显示“Windows 已保护你的电脑”。下载前先确认域名、文件名和 SHA-256。企业策略可能禁止运行未签名应用；这种情况下不要绕过组织策略。</p>
 
       <h2 id="diagnosis">出现问题时</h2>
@@ -50,8 +64,8 @@ import { withBase } from "../lib/paths";
         <li>配置恢复只使用可信备份，写后重新验证，失败时条件回滚。</li>
       </ul>
 
-      <h2>卸载</h2>
+      <h2 id="uninstall">卸载</h2>
       <p>先在应用内停止并确认 OpenClaw Gateway，再通过“安装与升级”中的卸载入口处理受管理组件。直接删除 exe 不会替你删除 OpenClaw 配置、会话或供应商凭证。</p>
-    </article>
+    </DocumentLayout>
   </section>
 </BaseLayout>

@@ -30,9 +30,10 @@ const { compact = false } = Astro.props;
   ) : (
     <>
       <button class="button button--unavailable" type="button" disabled>
+        <Icon name="windows" size={19} />
         {currentRelease.message}
       </button>
-      {!compact && <p class="release-action__meta">通过发布门禁后开放，不提供未经验证的安装包。</p>}
+      {!compact && <p class="release-action__meta">完成完整性与兼容性验证后开放，不提供未经验证的安装包。</p>}
     </>
   )}
 </div>

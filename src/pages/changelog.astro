@@ -1,28 +1,73 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { currentRelease } from "../data/release";
+import PageHero from "../components/PageHero.astro";
+import { currentRelease, formatBytes } from "../data/release";
+import { withBase } from "../lib/paths";
+
+const statusLabel = currentRelease.status === "available"
+  ? "正式版本可下载"
+  : currentRelease.status === "suspended"
+    ? "当前版本暂停下载"
+    : currentRelease.message;
 ---
 
 <BaseLayout title="更新日志" description="龙虾卫士公开版本与面向用户的更新说明。">
-  <header class="page-hero">
-    <div class="shell page-hero__inner">
-      <h1>更新日志</h1>
-      <p>这里只记录已经公开、可下载并通过发布门禁的版本。</p>
-    </div>
-  </header>
-  <section class="prose-section">
-    <article class="shell prose">
+  <PageHero
+    eyebrow="RELEASE NOTES"
+    title="更新日志"
+    description="这里只记录已经公开、可下载并完成完整性校验的版本。"
+  />
+  <section class="changelog-section">
+    <div class="shell changelog-layout">
+      <aside class="release-summary">
+        <p>公开版本状态</p>
+        <span class:list={["release-summary__dot", `release-summary__dot--${currentRelease.status}`]} aria-hidden="true"></span>
+        <strong>{statusLabel}</strong>
+        <span>未经验证的临时安装包不会出现在这里。</span>
+      </aside>
+
+      <article class="release-history">
       {currentRelease.status === "available" ? (
-        <>
-          <h2>v{currentRelease.version}</h2>
+        <section class="release-entry">
+          <div class="release-entry__heading">
+            <div>
+              <p>Windows x64</p>
+              <h2>v{currentRelease.version}</h2>
+            </div>
+            <time datetime={currentRelease.publishedAt}>{currentRelease.publishedAt}</time>
+          </div>
           <p>{currentRelease.notes}</p>
-          <p>发布时间：<time datetime={currentRelease.publishedAt}>{currentRelease.publishedAt}</time></p>
-        </>
+          <dl>
+            <div><dt>安装包</dt><dd>OpenClawConsole.exe</dd></div>
+            <div><dt>文件大小</dt><dd>{formatBytes(currentRelease.bytes)}</dd></div>
+            <div><dt>完整性校验</dt><dd>SHA-256 · minisign</dd></div>
+          </dl>
+        </section>
       ) : currentRelease.status === "suspended" ? (
-        <div class="notice">当前公开版本已暂停分发：{currentRelease.reason}</div>
+        <section class="release-empty release-empty--warning">
+          <p class="release-empty__label">DOWNLOAD SUSPENDED</p>
+          <h2>当前没有可安全下载的版本</h2>
+          <p>{currentRelease.reason}</p>
+          <a href={withBase("/security/")}>了解发布校验方式</a>
+        </section>
       ) : (
-        <div class="notice">首个 Windows 公开版本准备中，目前还没有可公开的版本记录。</div>
+        <section class="release-empty">
+          <p class="release-empty__label">FIRST PUBLIC RELEASE</p>
+          <h2>首个 Windows 公开版本准备中</h2>
+          <p>完成安装包验证后，这里会显示真实版本号、发布时间、文件大小和更新说明。</p>
+          <dl>
+            <div><dt>目标平台</dt><dd>Windows 10/11 · x64</dd></div>
+            <div><dt>交付形式</dt><dd>OpenClawConsole.exe · 单文件</dd></div>
+            <div><dt>分发渠道</dt><dd>GitHub Releases</dd></div>
+            <div><dt>完整性校验</dt><dd>SHA-256 · minisign</dd></div>
+          </dl>
+          <div class="release-empty__links">
+            <a href={withBase("/guide/")}>查看安装指南</a>
+            <a href={withBase("/security/")}>了解安全校验</a>
+          </div>
+        </section>
       )}
-    </article>
+      </article>
+    </div>
   </section>
 </BaseLayout>
