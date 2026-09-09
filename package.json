@@ -14,7 +14,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/sitemap": "3.7.3",
+    "@astrojs/sitemap": "3.7.4",
     "astro": "7.1.6",
     "lucide-astro": "^0.556.0"
   },
